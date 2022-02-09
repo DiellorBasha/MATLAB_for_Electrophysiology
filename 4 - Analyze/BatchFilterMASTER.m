@@ -1,5 +1,18 @@
+sh=1
+tic
+fn = fullfile(theFiles(sh).folder, theFiles(sh).name);
+CheckFilters; d=getspike2 (fn, 'all'); %import data from Spike2 
 
+    Fs=d(1).Fs;
+    time = [1:length(d(1).wv)].';
 
+    for k=1:size(d,2)   
+s(k).channel = d(k).title;
+s(k).signals  =d(k).wv;
+    end
+    
+  clear d a 
+  %% 
 
 
   %% 
@@ -39,15 +52,15 @@ disp ('Done.')
   disp('Filtering for spike/EPSP...') 
 
   threshold                   = mean (s(5).EPSP.derivative) + (std (s(5).EPSP.derivative))/2; 
-
+threshold = threshold*1.45;
   findpeaks (s(5).EPSP.derivative,...
-                              'MinPeakDistance', 150, 'MinPeakHeight', threshold*2.5);
+                              'MinPeakDistance', 50, 'MinPeakHeight', threshold);
                           %% 
                           
 [s(5).EPSP.pks,s(5).EPSP.locs,...
 s(5).EPSP.widths, s(5).EPSP.proms]...
                             = findpeaks (s(5).EPSP.derivative,...
-                              'MinPeakDistance', 150, 'MinPeakHeight', threshold*1.5); %find EPSP peaks
+                              'MinPeakDistance', 150, 'MinPeakHeight', threshold); %find EPSP peaks
 
 s(5).EPSP.EPSP_pks    = setdiff(s(5).EPSP.pks,s(5).EPSP.spike_pks(:,1)); % This returns the data in locs_EPSP that is not in locs_spike: i.e removes spike times
 s(5).EPSP.EPSP_locs   = setdiff(s(5).EPSP.locs,s(5).EPSP.spike_locs(:,1));
@@ -183,8 +196,9 @@ AnalyzingVmDistribution
     %% 
 disp('Filtering for phase...')
   % Filter for phase
-for k=1:2
-s(k).Phase.lowpass       = filtfilt (lpfil.Numerator,1, s(k).signals);
+for k=[10,12]
+% s(k).Phase.lowpass       = filtfilt (lpfil.Numerator,1, s(k).signals);
+s(k).Phase.lowpass       = s(k).signals;
 s(k).Phase.hilbert       = hilbert (s(k).Phase.lowpass);
 s(k).Phase.phase         = angle (s(k).Phase.hilbert);
 s(k).Phase.magnitude     = abs   (s(k).Phase.hilbert);
@@ -221,8 +235,8 @@ disp('Done.')
 
 %% Downsample
 dsFactor = 20;
-for k=1:6
-s(k).downsample.signal  = downsample (s(k).signals, 20);
+for k=1:7
+s(k).downsample.signal  = downsample (s(k).signals, 40);
 end
 s(1).downsample.Fs      = Fs/dsFactor;
 disp('Downsampling...')
