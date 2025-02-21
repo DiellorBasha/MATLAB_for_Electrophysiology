@@ -45,24 +45,52 @@ To perform wavelet analysis on EEG data, use the function:
 ### Example
 An example script (`example_script.m`) is included to demonstrate function usage. Run:
 ```matlab
-example_script
+
+%% Load or Generate Example Data
+fs = 1000; % Sampling frequency (Hz)
+duration = 10; % Duration of simulated EEG signal (seconds)
+t = 0:1/fs:duration-1/fs; % Time vector
+
+% Simulated EEG signal: sum of sine waves + noise
+eeg = sin(2*pi*10*t) + sin(2*pi*20*t) + randn(size(t))*0.5;
+
+% Define event onsets (randomly placed within signal duration)
+num_events = 20;
+onsets = sort(randi([fs, length(t)-fs], 1, num_events));
+
+%% Define Analysis Parameters
+downsampleFactor = 2;
+freq_range = [1 50]; % Frequency range (Hz)
+window_size = 2; % Window size around each event (seconds)
+
+%% Run Wavelet Event Analysis
+[out, res, frequencies] = wavelet_event_analysis(onsets, eeg, fs, downsampleFactor, freq_range, window_size);
+
+%% Plot the Results
+figure;
+imagesc(out);
+set(gca, 'YScale', 'log');
+colorbar;
+xlabel('Time (s)');
+ylabel('Frequency (Hz)');
+title('Wavelet Transform - Average Across Events');
+
 ```
 This will load sample EEG data, process it, and generate the corresponding wavelet plot.
 
 ## Citation
 If you use this code in your work, please cite the corresponding paper:
 ```
-@article{YourPaper2025,
-  author = {Author Name},
-  title = {Paper Title},
-  journal = {eLife},
-  year = {2025},
-  doi = {10.7554/eLife.XXXXXX}
-}
+Diellor Basha, Amirmohammad Azarmehri,Eliane Proulx, Sylvain Chauvette, Maryam Ghorbani, Igor Timofeev
+2023
+The reuniens nucleus of the thalamus facilitates hippocampo-cortical dialogue during sleepeLife12:RP90826
+https://doi.org/10.7554/eLife.90826.2
 ```
 
 ## License
-This repository is distributed under the **MIT License**. See `LICENSE` for details.
+This repository is distributed under the terms of the GNU General Public License
+as published by the Free Software Foundation. Further details on the GPLv3
+license can be found at https://opensource.org/license/gpl-3-0.
 
 ## Contact
 For questions or issues, please contact **[Your Name]** at **[Your Email]** or open an issue in this repository.
