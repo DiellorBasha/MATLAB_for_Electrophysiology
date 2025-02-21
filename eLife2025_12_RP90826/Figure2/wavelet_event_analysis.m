@@ -54,8 +54,7 @@ function [out, res, frequencies] = wavelet_event_analysis(onsets, eeg, fs, downs
             VoicesPerOctave=20, SamplingFrequency=newFs,...
             FrequencyLimits=[min(freq_range), max(freq_range)]);
         
-    % Preallocate output matrices
-    out = zeros(length(freq_range), round(window_size * newFs));
+    % Preallocate output matrix for downsampled spindle
     downsampled_spindle = zeros(length(onsets), window_size * newFs);
     
     % Loop through each onset event
